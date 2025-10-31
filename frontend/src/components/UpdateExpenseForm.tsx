@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, type ChangeEvent } from "react";
 import type { Expense } from "../types/types";
 
 interface UpdateExpenseFormProps {
@@ -14,6 +14,11 @@ const UpdateExpenseForm: React.FC<UpdateExpenseFormProps> = ({ expense, onUpdate
     category: "",
     date: "",
   });
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   useEffect(() => {
     if (expense) {
@@ -53,7 +58,7 @@ const UpdateExpenseForm: React.FC<UpdateExpenseFormProps> = ({ expense, onUpdate
             type="text"
             placeholder="Title"
             value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            onChange={handleChange}
             required
             className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           />
@@ -70,7 +75,7 @@ const UpdateExpenseForm: React.FC<UpdateExpenseFormProps> = ({ expense, onUpdate
             min="0"
             step="0.01"
             value={formData.amount}
-            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+            onChange={handleChange}
             required
             className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           />
@@ -85,7 +90,7 @@ const UpdateExpenseForm: React.FC<UpdateExpenseFormProps> = ({ expense, onUpdate
             type="text"
             placeholder="Category"
             value={formData.category}
-            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+            onChange={handleChange}
             required
             className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           />
@@ -99,7 +104,7 @@ const UpdateExpenseForm: React.FC<UpdateExpenseFormProps> = ({ expense, onUpdate
             id="date"
             type="date"
             value={formData.date}
-            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+            onChange={handleChange}
             required
             className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
           />
