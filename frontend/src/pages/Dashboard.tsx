@@ -8,11 +8,14 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
 import Summary from "../components/Summary";
+import ExpenseCharts from "../components/ExpenseCharts";
 
 export default function Dashboard() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showSummaryModal, setShowSummaryModal] = useState(false);
+  const [showChartModal, setShowChartModal] = useState(false);
+  const [chartType, setChartType] = useState<'category' | 'date'>('category');
   const { token } = useAuth();
   const navigate = useNavigate();
 
@@ -90,6 +93,12 @@ export default function Dashboard() {
               Summary
             </button>
             <button
+              onClick={() => setShowChartModal(true)}
+              className="px-6 py-2 rounded-md bg-green-600 text-white font-medium hover:bg-green-700 transition"
+            >
+              Charts
+            </button>
+            <button
               onClick={() => setShowAddModal(true)}
               className="px-6 py-2 rounded-md bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition"
             >
@@ -134,6 +143,51 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {showChartModal && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-center items-center z-50">
+          <div className="bg-white rounded-xl shadow-lg p-4 max-w-3xl w-full mx-4 relative">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Date Chart</h2>
+              <button
+                onClick={() => setShowChartModal(false)}
+                className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+                aria-label="Close chart modal"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="flex mb-4 space-x-4 justify-center">
+              <button
+                className={`px-4 py-2 rounded ${
+                  chartType === 'category'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-gray-200 text-gray-800'
+                }`}
+                onClick={() => setChartType('category')}
+              >
+                By Category
+              </button>
+              <button
+                className={`px-4 py-2 rounded ${
+                  chartType === 'date'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-gray-200 text-gray-800'
+                }`}
+                onClick={() => setChartType('date')}
+              >
+                By Date
+              </button>
+            </div>
+            {chartType === 'category' ? (
+              <ExpenseCharts expenses={expenses} type="category" />
+            ) : (
+              <ExpenseCharts expenses={expenses} type="date" />
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
