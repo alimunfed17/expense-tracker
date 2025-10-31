@@ -1,31 +1,27 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { login } from "../api/authApi";
 import { FaSignInAlt } from "react-icons/fa";
-
-interface LoginFormState {
-  email: string;
-  password: string;
-}
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [form, setForm] = useState<LoginFormState>({ email: "", password: "" });
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+  const { login } = useAuth();
+
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      const res = await login(form);
-      localStorage.setItem("token", res.data.token);
-      navigate("/");
+      await login(form.email, form.password);
+      navigate("/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed");
     } finally {
@@ -41,32 +37,28 @@ export default function Login() {
           <h2 className="text-2xl font-extrabold text-center text-gray-800">
             Welcome Back!
           </h2>
-          <p className="text-gray-500 text-sm text-center mt-2">
-            Sign in to track your expenses and achieve your financial goals.
-          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <input
             type="email"
             name="email"
-            autoComplete="username"
             placeholder="Email"
-            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 transition shadow"
-            onChange={handleChange}
             value={form.email}
+            onChange={handleChange}
+            className="w-full border p-3 rounded-lg"
             required
           />
           <input
             type="password"
             name="password"
-            autoComplete="current-password"
             placeholder="Password"
-            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 transition shadow"
-            onChange={handleChange}
             value={form.password}
+            onChange={handleChange}
+            className="w-full border p-3 rounded-lg"
             required
           />
+
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
           <button
@@ -79,7 +71,7 @@ export default function Login() {
         </form>
 
         <p className="text-sm text-gray-600 mt-6 text-center">
-          Don't have an account?{" "}
+          Don’t have an account?{" "}
           <Link to="/register" className="text-blue-600 underline font-medium hover:text-purple-600 transition">
             Register
           </Link>

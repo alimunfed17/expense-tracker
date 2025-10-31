@@ -1,35 +1,25 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { register } from "../api/authApi";
 import { FaUserPlus } from "react-icons/fa";
-
-interface RegisterFormState {
-  name: string;
-  email: string;
-  password: string;
-}
+import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
   const navigate = useNavigate();
-  const [form, setForm] = useState<RegisterFormState>({
-    name: "",
-    email: "",
-    password: "",
-  });
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+  const { signup } = useAuth();
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      await register(form);
-      navigate("/login");
+      await signup(form.name, form.email, form.password);
+      navigate("/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.message || "Registration failed");
     } finally {
@@ -45,9 +35,6 @@ export default function Register() {
           <h2 className="text-2xl font-extrabold text-center text-gray-800">
             Create Your Account
           </h2>
-          <p className="text-gray-500 text-sm text-center mt-2">
-            Register in seconds and start managing your expenses smarter!
-          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -55,29 +42,30 @@ export default function Register() {
             type="text"
             name="name"
             placeholder="Full Name"
-            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500 transition shadow"
-            onChange={handleChange}
             value={form.name}
+            onChange={handleChange}
+            className="w-full border p-3 rounded-lg"
             required
           />
           <input
             type="email"
             name="email"
             placeholder="Email"
-            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500 transition shadow"
-            onChange={handleChange}
             value={form.email}
+            onChange={handleChange}
+            className="w-full border p-3 rounded-lg"
             required
           />
           <input
             type="password"
             name="password"
             placeholder="Password"
-            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500 transition shadow"
-            onChange={handleChange}
             value={form.password}
+            onChange={handleChange}
+            className="w-full border p-3 rounded-lg"
             required
           />
+
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
           <button
@@ -91,7 +79,7 @@ export default function Register() {
 
         <p className="text-sm text-gray-600 mt-6 text-center">
           Already have an account?{" "}
-          <Link to="/login" className="text-purple-600 underline font-medium hover:text-pink-600 transition">
+          <Link to="/login" className="text-purple-600 underline">
             Login
           </Link>
         </p>
