@@ -19,4 +19,3 @@ This is an assignment project built on React & Node for the role of Full Stack I
 ## License
 
 - The license for the project can be found at ***[./LICENSE](./LICENSE)***.
-
