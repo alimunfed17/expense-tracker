@@ -9,6 +9,7 @@ import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
 import Summary from "../components/Summary";
 import ExpenseCharts from "../components/ExpenseCharts";
+import { parseFilters } from "../utils/parseFilters";
 
 export default function Dashboard() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -16,24 +17,34 @@ export default function Dashboard() {
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [showChartModal, setShowChartModal] = useState(false);
   const [chartType, setChartType] = useState<'category' | 'date'>('category');
+  const [filters, setFilters] = useState({});
   const { token } = useAuth();
   const navigate = useNavigate();
+
+  const handleSearch = async (input: string) => {
+    const parsedFilters = parseFilters(input);
+    setFilters(parsedFilters);
+    try {
+      const res = await getExpenses(parsedFilters);
+      setExpenses(res.data);
+    } catch (error) {
+      console.error("Error fetching expenses with filters:", error);
+    }
+  };
+
 
   useEffect(() => {
     if (!token) navigate("/login");
   }, [token, navigate]);
 
-  const fetchExpenses = async (search?: string) => {
+  const fetchExpenses = async (filters = {}) => {
     try {
-      const filters = search ? { search } : {};
       const res = await getExpenses(filters);
       setExpenses(res.data);
     } catch (error) {
       console.error("Error fetching expenses:", error);
     }
   };
-
-
 
   useEffect(() => {
     if (token) fetchExpenses();
@@ -53,7 +64,7 @@ export default function Dashboard() {
         date: expense.date,
       };
       await addExpense(payload);
-      await fetchExpenses();
+      await fetchExpenses(filters);
       setShowAddModal(false);
     } catch (error) {
       console.error("Error adding expense:", error);
@@ -72,7 +83,7 @@ export default function Dashboard() {
   const handleUpdateExpense = async (id: string, data: Partial<Expense>) => {
     try {
       await updateExpense(id, data);
-      await fetchExpenses();
+      await fetchExpenses(filters);
     } catch (error) {
       console.error("Error updating expense:", error);
     }
@@ -106,8 +117,9 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
-        
-        <SearchBar onSearch={fetchExpenses} />
+
+        <SearchBar onSearch={handleSearch} />
+
         <ExpenseList
           expenses={expenses}
           onDelete={handleDeleteExpense}
@@ -187,7 +199,6 @@ export default function Dashboard() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
