@@ -17,7 +17,6 @@ export default function Header() {
           backdrop-blur-lg border-b border-purple-200 sticky top-0 z-50"
       style={{ backdropFilter: "blur(12px)" }}
     >
-      {/* Logo Section */}
       <div
         className="flex items-center gap-2 cursor-pointer"
         onClick={() => navigate("/")}
@@ -28,7 +27,6 @@ export default function Header() {
         </span>
       </div>
 
-      {/* Navigation & Actions */}
       <div className="flex items-center gap-4">
         <button
           onClick={() => navigate("/user")}
